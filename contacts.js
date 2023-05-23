@@ -15,41 +15,28 @@ const getContactById = async (contactId) => {
   return result || null;
 };
 
-function removeContact(contactId) {
-  fs.readFile(contactsPath, "utf-8")
-    .then((data) => {
-      const contacts = JSON.parse(data);
-      const updatedContacts = contacts.filter((c) => c.id !== contactId);
-      return fs.writeFile(
-        contactsPath,
-        JSON.stringify(updatedContacts, null, 2)
-      );
-    })
-    .then(() => {
-      console.log("Contact removed successfully");
-    })
-    .catch((error) => {
-      console.error("Error reading or writing contacts file:", error);
-    });
-}
+const removeContact = async (contactId) => {
+  const contacts = await listContacts();
+  const index = contacts.findIndex((contact) => contact.id === contactId);
+  if (index === -1) {
+    return null;
+  }
+  const [result] = contacts.splice(index, 1);
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  return result;
+};
 
-function addContact(name, email, phone) {
-  fs.readFile(contactsPath, "utf-8")
-    .then((data) => {
-      const contacts = JSON.parse(data);
-      const newContact = { id: Date.now(), name, email, phone };
-      const updatedContacts = [...contacts, newContact];
-      return fs.writeFile(
-        contactsPath,
-        JSON.stringify(updatedContacts, null, 2)
-      );
-    })
-    .then(() => {
-      console.log("Contact added successfully");
-    })
-    .catch((error) => {
-      console.error("Error reading or writing contacts file:", error);
-    });
-}
+const addContact = async (name, email, phone) => {
+  const contacts = await listContacts();
+  const newContact = {
+    id: nanoid(),
+    name,
+    email,
+    phone,
+  };
+  contacts.push(newContact);
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  return newContact;
+};
 
 module.exports = { listContacts, getContactById, removeContact, addContact };

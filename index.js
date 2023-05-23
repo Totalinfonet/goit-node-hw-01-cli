@@ -9,11 +9,11 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
       const oneContact = await contacts.getContactById(id);
       return console.table(oneContact);
     case "remove":
-      await removeContact(id);
-      break;
+      const deletedContact = await contacts.removeContact(id);
+      return console.table(deletedContact);
     case "add":
-      await addContact(name, email, phone);
-      break;
+      const newContact = await contacts.addContact(name, email, phone);
+      return console.table(newContact);
     default:
       console.log("Invalid action");
   }
@@ -21,5 +21,10 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
 
 invokeAction({ action: "list" });
 invokeAction({ action: "getById", id: "drsAJ4SHPYqZeG-83QTVW" });
-// invokeAction({ action: "remove", id: 1684778177098 });
-// invokeAction({ action: "add", name: "John Doe", email: "johndoe@example.com", phone: "123456789" });
+invokeAction({ action: "remove", id: "1DEXoP8AuCGYc1YgoQ6hw" });
+invokeAction({
+  action: "add",
+  name: "John Doe",
+  email: "johndoe@example.com",
+  phone: "(123) 456-7890",
+});
