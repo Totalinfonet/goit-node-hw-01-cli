@@ -1,34 +1,19 @@
 const fs = require("fs").promises;
 const path = require("path");
+const { nanoid } = require("nanoid");
 
 const contactsPath = path.join(__dirname, "db", "contacts.json");
 
-function listContacts() {
-  fs.readFile(contactsPath, "utf-8")
-    .then((data) => {
-      const contacts = JSON.parse(data);
-      console.log("Contacts:", contacts);
-    })
-    .catch((error) => {
-      console.error("Error reading contacts file:", error);
-    });
-}
+const listContacts = async () => {
+  const data = await fs.readFile(contactsPath, "utf-8");
+  return JSON.parse(data);
+};
 
-function getContactById(contactId) {
-  fs.readFile(contactsPath, "utf-8")
-    .then((data) => {
-      const contacts = JSON.parse(data);
-      const contact = contacts.find((c) => c.id === contactId);
-      if (contact) {
-        console.log("Contact:", contact);
-      } else {
-        console.log("Contact not found");
-      }
-    })
-    .catch((error) => {
-      console.error("Error reading contacts file:", error);
-    });
-}
+const getContactById = async (contactId) => {
+  const contacts = await listContacts();
+  const result = contacts.find((contact) => contact.id === contactId);
+  return result || null;
+};
 
 function removeContact(contactId) {
   fs.readFile(contactsPath, "utf-8")
