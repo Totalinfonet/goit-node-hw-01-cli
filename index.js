@@ -1,30 +1,43 @@
+const { Command } = require("commander");
 const contacts = require("./contacts");
 
-const invokeAction = async ({ action, id, name, email, phone }) => {
+const program = new Command();
+program
+  .option("-a, --action <type>", "choose action")
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
+
+program.parse(process.argv);
+
+const { action, id, name, email, phone } = program.opts();
+
+async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case "list":
       const allContacts = await contacts.listContacts();
-      return console.table(allContacts);
-    case "getById":
+      console.table(allContacts);
+      break;
+
+    case "get":
       const oneContact = await contacts.getContactById(id);
-      return console.table(oneContact);
+      console.table(oneContact);
+      break;
+
     case "remove":
       const deletedContact = await contacts.removeContact(id);
-      return console.table(deletedContact);
+      console.table(deletedContact);
+      break;
+
     case "add":
       const newContact = await contacts.addContact(name, email, phone);
-      return console.table(newContact);
-    default:
-      console.log("Invalid action");
-  }
-};
+      console.table(newContact);
+      break;
 
-invokeAction({ action: "list" });
-invokeAction({ action: "getById", id: "drsAJ4SHPYqZeG-83QTVW" });
-invokeAction({ action: "remove", id: "1DEXoP8AuCGYc1YgoQ6hw" });
-invokeAction({
-  action: "add",
-  name: "John Doe",
-  email: "johndoe@example.com",
-  phone: "(123) 456-7890",
-});
+    default:
+      console.warn("\x1B[31m Unknown action type!");
+  }
+}
+
+invokeAction({ action, id, name, email, phone });
